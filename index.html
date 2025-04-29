@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <script src="https://js.tosspayments.com/v2/standard"></script>
+</head>
+<body>
+  <div id="payment-method"></div>
+  <div id="agreement"></div>
+  <button id="payment-button" style="margin-top: 30px">결제하기</button>
+  <script>
+    async function main() {
+      const button = document.getElementById("payment-button");
+      const tossPayments = TossPayments("본인_클라이언트키");
+      const widgets = tossPayments.widgets({ customerKey: "고객키" });
+
+      await widgets.setAmount({ currency: "KRW", value: 50000 });
+
+      await Promise.all([
+        widgets.renderPaymentMethods({ selector: "#payment-method" }),
+        widgets.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" }),
+      ]);
+
+      button.addEventListener("click", async function () {
+        await widgets.requestPayment({
+          orderId: "ORDER_ID",
+          orderName: "상품명",
+          successUrl: "https://your-success-url",
+          failUrl: "https://your-fail-url",
+          customerEmail: "customer@example.com",
+          customerName: "홍길동",
+        });
+      });
+    }
+    main();
+  </script>
+</body>
+</html>
