@@ -18,16 +18,17 @@
 
       async function main() {
         const button = document.getElementById("payment-button");
-        const coupon = document.getElementById("coupon-box");
+
         // ------  결제위젯 초기화 ------
         const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
         const tossPayments = TossPayments(clientKey);
+
         // 회원 결제
         const customerKey = "qm1Uq6Y0AGhgSFKBBeGfN";
         const widgets = tossPayments.widgets({
           customerKey,
         });
-        // 비회원 결제
+        // 비회원 결제 (필요시 주석 해제)
         // const widgets = tossPayments.widgets({ customerKey: TossPayments.ANONYMOUS });
 
         // ------ 주문의 결제 금액 설정 ------
@@ -45,39 +46,29 @@
           widgets.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" }),
         ]);
 
-        // ------  주문서의 결제 금액이 변경되었을 경우 결제 금액 업데이트 ------
-        coupon.addEventListener("change", async function () {
-          await widgets.setAmount({
-            currency: "KRW",
-            value: 50000,
-          });
-        });
-
         // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
         button.addEventListener("click", async function () {
-          console.log("결제하기 버튼 클릭됨");  // ✅ 추가된 부분
+          console.log("결제하기 버튼 클릭됨");
 
           await widgets.requestPayment({
-          orderId: "Ni1S_LLyhAbCPbpeMdYlM",
-          orderName: "토스 티셔츠 외 2건",
-          successUrl: "https://moovingsloth.github.io/my-toss-payment/success.html",
-          failUrl: "https://moovingsloth.github.io/my-toss-payment//fail.html",
-          customerEmail: "customer123@gmail.com",
-          customerName: "김토스",
-          customerMobilePhone: "01012341234",
-        }).then(function (response) {
-          // 성공했으면 WebView -> React Native로 메시지 보내기
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: "success",
-            data: response,
-          }));
-        }).catch(function (error) {
-          // 실패했으면 실패 메시지 보내기
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: "error",
-            data: error,
-          }));
-        });
+            orderId: "Ni1S_LLyhAbCPbpeMdYlM",
+            orderName: "토스 티셔츠 외 2건",
+            successUrl: "https://moovingsloth.github.io/my-toss-payment/success.html",
+            failUrl: "https://moovingsloth.github.io/my-toss-payment//fail.html",
+            customerEmail: "customer123@gmail.com",
+            customerName: "김토스",
+            customerMobilePhone: "01012341234",
+          }).then(function (response) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: "success",
+              data: response,
+            }));
+          }).catch(function (error) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: "error",
+              data: error,
+            }));
+          });
         });
       }
     </script>
